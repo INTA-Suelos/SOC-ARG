@@ -2,21 +2,12 @@ setwd("~/Documents/SOC-ARG/")
 
 library(raster)
 
-dat <- read.csv("data/data.csv")
-val <- read.csv("data/validation.csv")
-
-cols <- names(val)
-
-cols <- cols[c(1:5, 7:8)]
-
-dat <- rbind(dat[, cols], val[, cols])
+dat <- read.csv("data/REV_alldata.csv")
 
 dat$Date <- as.Date(dat$Date)
 
 
 nrow(dat[dat$Date > "2005-01-01",])
-
-set.seed(123)
 
 val <- dat[dat$Date > "2005-01-01",]
 library(sp)
@@ -29,6 +20,9 @@ coordinates(cal) <- ~ X + Y
 plot(cal)
 
 pred <- dat
+
+write.csv(cal, "data/REV-cal.csv", row.names = F)
+write.csv(val, "data/REV-val.csv", row.names = F)
 
 # 
 # candidates <- dat[dat$Date > "2005-01-01",]
