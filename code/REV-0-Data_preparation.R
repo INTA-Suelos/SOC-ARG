@@ -54,7 +54,33 @@ input2 <- input2[1:nrow(input),]
 
 input$BD <- predict(model.rf, input2)
 
+#### CRF
 
+CRF1 <- raster("CRFVOL_M_sl1_1km_Argentina.tiff")
+CRF2 <- raster("CRFVOL_M_sl2_1km_Argentina.tiff")
+CRF3 <- raster("CRFVOL_M_sl3_1km_Argentina.tiff")
+CRF4 <- raster("CRFVOL_M_sl4_1km_Argentina.tiff")
+
+CRF <- mean(CRF1, CRF2, CRF3, CRF4)
+names(CRF) <- "CRF"
+
+coordinates(input) <- ~ X+ Y
+
+input <- extract(CRF, input, sp = T)
+
+input <- as.data.frame(input)
+
+##### OCSKGM calculation #####
+
+
+library(GSIF)
+input$ORCDRC <- input$OC*10
+
+input$ORCDRC[input$ORCDRC == 0] <- NA
+temp <- OCSKGM(ORCDRC = input$ORCDRC, BLD = input$BD*1000,
+               CRFVOL = input$CRF, HSIZE = input$bottom-input$top)
+input$OCSKGM <- temp
+input$meaERROR <- attr(temp,"measurementError")
 
 
 
