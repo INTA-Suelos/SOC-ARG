@@ -2,14 +2,8 @@ setwd("~/Documents/SOC-ARG/")
 
 library(raster)
 
-dat <- read.csv("data/data.csv")
-val <- read.csv("data/validation.csv")
+dat <- read.csv("data/REV-data.csv")
 
-cols <- names(val)
-
-cols <- cols[c(1:5, 7:8)]
-
-dat <- rbind(dat[, cols], val[, cols])
 
 dat <- dat[complete.cases(dat),]
 dat$Date <- as.character(dat$Date)
