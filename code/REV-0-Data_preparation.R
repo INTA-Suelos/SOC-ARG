@@ -85,10 +85,10 @@ input$meaERROR <- attr(temp,"measurementError")
 
 
 ## Agregar otros datos con dato de stock
-input <- input[,c(1,2,3,4,13,7)]
+input <- input[,c(1,2,3,4,17,7)]
 input$type = "SP"
 
-stocks <- read.csv("Base_Andriulo+Carina_Alvarez_CO_Stock.csv")
+stocks <- read.csv("data/Base_Andriulo+Carina_Alvarez_CO_Stock.csv")
 stocks$año.muestro <- paste0(stocks$año.muestro, "-01-01")
 stocks$año.muestro <- strptime(stocks$año.muestro, "%Y-%m-%d")
 stocks$COS..30..Mg.ha. <- stocks$COS..30..Mg.ha. / 10
@@ -102,62 +102,6 @@ input$top <- 0
 input$bottom <- 30
 
 input <- input[complete.cases(input),]
-#input <- input[input$OCSKGM > 0,]
 
-#Soil profile collection
-
-
-############ Prepare validation dataset
-validation <- input[input$Date>'2014-01-01' & input$Date<'2016-12-31',]
-input <- input[input$Date<'2014-01-01' | input$Date>'2016-12-31',]
-
-write.csv(validation, "validation/val_141516.csv")
-
-################
-
-input.aqp <- input
-depths(input.aqp) <- ID ~ top + bottom
-input <- input[!is.na(input$X), ]
-coordinates(input) <- ~ X + Y
-
-
-### Descriptive analysis
-
-hist(input$OCSKGM[input$OCSKGM< 5], breaks = 100)
-summary(input$OCSKGM)
-hist(log(input$OCSKGM[input$OCSKGM< 5]), breaks = 100)
-
-## ADM limits
-lim=readRDS("ARG_adm2.rds")
-
-
-
-bubble(input, "OCSKGM", sp.layout = lim)
-
-
-################################################################################
-#### Covariates preparation ####
-
-## MODIS stacks
-library(raster)
-# covs <- stack("stack1000.tif")
-#names(covs) <- readRDS("namesStack1000.rds")
-
-files <- list.files(path = "Layers/", pattern = "tif$", full.names = T)
-covs <- stack(files)
-
-
-
-#### Add covariates to data ####
-# Convert to spatial points df and project
-input@proj4string <- CRS("+init=epsg:4326")
-
-input@data <- cbind(input@data, extract(covs, input))
-
-
-summary(input@data)
-input@data <- input@data[,-c(19, 32)]
-
-
-write.csv(as.data.frame(input), "ARGregMatrix_covsLayers.csv")
+write.csv(input, "data/REV-data.csv", row.names = F)
 
