@@ -22,7 +22,9 @@ names(covs) <- readRDS("namesStack1000.rds")
 covs[[24]] <- as.factor(covs[[24]])
 
 dat <- extract(covs, dat, sp=TRUE)
-dat <- dat[complete.cases(dat@data),]
+dat <- as.data.frame(dat)
+
+dat <- dat[complete.cases(dat),]
 
 
 ## load validation data
@@ -38,22 +40,24 @@ library(doParallel)
 
 models <- list()
 
+
 for(i in 1:10){
-  inTrain <- createDataPartition(y = dat@data$OCSKGM, p = .80, list = FALSE)
-  training <- dat@data[ inTrain,]
-  testing <- dat@data[-inTrain,]
-  fm = as.formula(paste(names(dat[,7+i]), "~", paste0(names(covs),
+  print(names(dat[9+i]))
+  inTrain <- createDataPartition(y = dat$OCSKGM, p = .80, list = FALSE)
+  training <- dat[ inTrain,]
+  testing <- dat[-inTrain,]
+  fm = as.formula(paste(names(dat[9+i]), "~", paste0(names(covs),
                                            collapse = "+")))
   cl <- makeCluster(detectCores(), type='PSOCK')
   registerDoParallel(cl)
   control2 <- rfeControl(functions=rfFuncs, method="repeatedcv", number=10, repeats=10)
   set.seed(1)
-  training <- training[!is.na(training[,7+i]),]
-  rfmodel <- rfe(x=training[,names(covs)], y=training[,7+i], sizes=2^(2:4), rfeControl=control2)
-  testing$residuals <- testing$OCSKGM - predict(rfmodel, testing)
+  training <- training[!is.na(training[,9+i]),]
+  rfmodel <- rfe(x=training[,names(covs)], y=training[,9+i], sizes=2^(2:4), rfeControl=control2)
+  # testing$residuals <- testing$OCSKGM - predict(rfmodel, testing)
   stopCluster(cl = cl)
-  models[i] <- rfmodel
-  names(models)[i] <- names(dat[7+i])
+  models[[i]] <- rfmodel
+  names(models)[[i]] <- names(dat[9+i])
 }
 
 save(models, file="models.RData")
