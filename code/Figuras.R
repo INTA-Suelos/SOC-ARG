@@ -26,9 +26,9 @@ d@proj4string <- CRS("+init=epsg:4326")
 d <- st_as_sf(d)
 arg <- st_as_sf(arg)
 # plot
-maps <- ggplot() + geom_sf(data = arg) + geom_sf(data = d, size = 0.3, aes(color = type)) +
+ggplot() + geom_sf(data = arg) + geom_sf(data = d, size = 0.3, aes(color = type)) +
   facet_wrap(facets = "type") + theme_grey() + labs(x = "Longitude", y = "Latitude") + 
-  theme(legend.position="none") + coord_sf() +
+  theme(legend.position="none") + coord_sf(datum=st_crs(4326)) +
   theme(text=element_text(size=12,  family="serif"), 
         axis.text.x = element_text(angle = 90, vjust = 0.5)) + 
   theme(panel.spacing = unit(2.5, "lines")) + 
