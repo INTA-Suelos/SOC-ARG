@@ -26,7 +26,7 @@ d <- st_as_sf(d)
 arg <- st_as_sf(arg)
 # plot
 maps <- ggplot() + geom_sf(data = arg) + geom_sf(data = d, size = 0.3, aes(color = type)) +
-  facet_wrap(facets = "type") + theme_grey() + labs(x = "Long", y = "Lat") + 
+  facet_wrap(facets = "type") + theme_grey() + labs(x = "Longitude", y = "Latitude") + 
   theme(legend.position="none") +
   theme(text=element_text(size=12,  family="serif"), 
         axis.text.x = element_text(angle = 90, vjust = 0.5)) + theme(panel.spacing = unit(2.5, "lines"))
@@ -49,3 +49,20 @@ fig1 <- plot_grid(maps, hist, labels = c("a", "b"), nrow = 2, align = "v",
 
 ggsave(filename = "results/fig1.png", plot = fig1, width = 5, height = 7)
 
+###### Fig 2 ##########################
+rm(list = ls())
+name <- function(x) { as.data.frame(names(x))}
+library(rasterVis)
+# load predicted map
+soc <- raster("results/OCSKGM2015.tif")
+# plot 
+map <- gplot(soc, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
+  scale_fill_gradient(na.value = "transparent", high = "yellow",
+                      name = expression(kg/m^2)) +
+  xlab("Longitude") + ylab("Latitude") +
+  coord_sf(crs = 4326) + 
+  theme(text=element_text(size=12,  family="serif"))
+# save
+ggsave(filename = "results/fig2.png", plot = map, width = 4, height = 7)
+###############################################################
+                        
