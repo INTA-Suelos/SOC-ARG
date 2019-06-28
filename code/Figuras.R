@@ -75,7 +75,10 @@ ymax <- sf::st_bbox(arg)["ymax"]
 
 # plot 
 map <- gplot(soc, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
-  scale_fill_gradient(na.value = "transparent", high = "yellow",
+    scale_fill_gradient2(low = "black",midpoint = 30, mid = "yellow",
+                         high = "red", space = "Lab",
+                        na.value = "transparent",
+                      breaks = c(0,5,15,30,50,70),
                       name = expression(kg/m^2)) +
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(crs = 4326) + coord_equal() +
