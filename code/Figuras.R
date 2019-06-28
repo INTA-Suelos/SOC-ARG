@@ -28,7 +28,7 @@ maps <- ggplot() + geom_sf(data = arg) + geom_sf(data = d, size = 0.3, aes(color
   facet_wrap(facets = "type") + theme_grey() + labs(x = "Long", y = "Lat") + 
   theme(legend.position="none") +
   theme(text=element_text(size=12,  family="serif"), 
-        axis.text.x = element_text(angle = 45)) + theme(panel.spacing = unit(2, "lines"))
+        axis.text.x = element_text(angle = 90, vjust = 0.5)) + theme(panel.spacing = unit(2.5, "lines"))
 
 d <- as_tibble(d)
 d$Date <- d$Date %>% as.character() %>% strptime("%Y-%m-%d") %>% as.POSIXct()
