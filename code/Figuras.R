@@ -49,7 +49,7 @@ fig1 <- plot_grid(maps, hist, labels = c("a", "b"), nrow = 2, align = "v",
 
 ggsave(filename = "results/fig1.png", plot = fig1, width = 5, height = 7)
 
-###### Fig 2 ##########################
+###### Fig 3 ##########################
 rm(list = ls())
 name <- function(x) { as.data.frame(names(x))}
 library(rasterVis)
@@ -63,6 +63,6 @@ map <- gplot(soc, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray(
   coord_sf(crs = 4326) + 
   theme(text=element_text(size=12,  family="serif"))
 # save
-ggsave(filename = "results/fig2.png", plot = map, width = 4, height = 7)
+ggsave(filename = "results/fig3.png", plot = map, width = 4, height = 7)
 ###############################################################
                         
