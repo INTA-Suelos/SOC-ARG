@@ -26,7 +26,7 @@ d@proj4string <- CRS("+init=epsg:4326")
 d <- st_as_sf(d)
 arg <- st_as_sf(arg)
 # plot
-ggplot() + geom_sf(data = arg) + geom_sf(data = d, size = 0.3, aes(color = type)) +
+maps <- ggplot() + geom_sf(data = arg) + geom_sf(data = d, size = 0.3, aes(color = type)) +
   facet_wrap(facets = "type") + theme_grey() + labs(x = "Longitude", y = "Latitude") + 
   theme(legend.position="none") + coord_sf(datum=st_crs(4326)) +
   theme(text=element_text(size=12,  family="serif"), 
@@ -75,13 +75,13 @@ ymax <- sf::st_bbox(arg)["ymax"]
 
 # plot 
 map <- gplot(soc, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
-    scale_fill_gradient2(low = "black",midpoint = 30, mid = "yellow",
+    scale_fill_gradient2(low = "black",midpoint = 35, mid = "yellow",
                          high = "red", space = "Lab",
                         na.value = "transparent",
                       breaks = c(0,5,15,30,50,70),
                       name = expression(kg/m^2)) +
   xlab("Longitude") + ylab("Latitude") +
-  coord_sf(crs = 4326) + coord_equal() +
+  coord_sf(crs = 4326) + #coord_equal() +
   theme(text=element_text(size=12,  family="serif")) +
   ggsn::scalebar(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
                  st.color = "#666666", dist = 300, 
@@ -95,5 +95,54 @@ map <- gplot(soc, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray(
 
 # save
 ggsave(filename = "results/fig3.png", plot = map, width = 4, height = 7)
-###############################################################
-                        
+
+####### Fig 4 ###################################
+
+soc.u <- raster("results/qrf_residuals.tif")
+summary(soc.u)
+
+map.u <- 
+  gplot(soc.u, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
+  scale_fill_gradient2(low = "black",midpoint = 12, mid = "yellow",
+                       high = "red", space = "Lab",
+                       na.value = "transparent",
+                       breaks = c(0,3,6,9,12),
+                       name = expression(kg/m^2)) +
+  xlab("Longitude") + ylab("") +
+  coord_sf(crs = 4326) + #coord_equal() +
+  theme(text=element_text(size=12,  family="serif")) +
+  ggsn::scalebar(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
+                 st.color = "#666666", dist = 300, 
+                 st.size=3, height=0.02, transform = T,
+                 model = "WGS84", dist_unit = "km", 
+                 border.size = 0.1, anchor = c(x=-56, y=-57)) + 
+  ggsn::north(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
+              scale = 0.15, symbol = 12, 
+              location = "topleft")
+Fig3_4 <- plot_grid(map, map.u, labels = c("a", "b"), ncol = 2, align = "h",
+          label_fontfamily = "serif")
+
+ggsave(filename = "results/fig3_4.png", plot = Fig3_4, width = 8, height = 5.76)
+
+
+#### plot del error relativo (no pedido) #############################
+# rel.e <- soc.u/soc
+# summary(rel.e) 
+# gplot(rel.e*100, maxpixels = 1e+5) + geom_tile(aes(fill = value)) + theme_gray() +
+#   scale_fill_gradient2(low = "black", mid = "yellow",midpoint = 200,
+#                        high = "red", space = "Lab",
+#                        na.value = "transparent",
+#                        breaks = c(50,100,200,500),
+#                        name = "relative error (%)"
+#                        ) +
+#   xlab("Longitude") + ylab("") +
+#   coord_sf(crs = 4326) + #coord_equal() +
+#   theme(text=element_text(size=12,  family="serif")) +
+#   ggsn::scalebar(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
+#                  st.color = "#666666", dist = 300, 
+#                  st.size=3, height=0.02, transform = T,
+#                  model = "WGS84", dist_unit = "km", 
+#                  border.size = 0.1, anchor = c(x=-56, y=-57)) + 
+#   ggsn::north(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
+#               scale = 0.15, symbol = 12, 
+#               location = "topleft")
