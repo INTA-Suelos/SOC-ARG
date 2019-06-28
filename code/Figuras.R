@@ -166,3 +166,14 @@ fig5 <-  ggplot(w, aes(x = observed, y = pred)) + geom_abline(intercept = 0, col
   theme(text=element_text(size=16,  family="serif"))
 
 ggsave(filename = "results/fig5.png", plot = fig5, width = 8, height = 4)
+
+# alternatively
+fig5b <- ggplot(w, aes(x = observed, y = pred)) + geom_abline(intercept = 0, color = "white") +
+    geom_bin2d(binwidth = c(0.25, 0.25),alpha = 0.6, aes(fill = variable)) +
+    #geom_point(size = 1, alpha = 0.1, aes(color = variable)) + 
+    coord_fixed(ratio = 1, xlim = c(0,20), ylim = c(0,20)) + 
+  #facet_wrap(facets = "variable") + 
+  labs(x = "Observed", y = "Predicted") + #geom_density_2d(aes(color = variable)) +
+  theme(text=element_text(size=16,  family="serif"))
+
+ggsave(filename = "results/fig5b.png", plot = fig5b, width = 8, height = 4)
