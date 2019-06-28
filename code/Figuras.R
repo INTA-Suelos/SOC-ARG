@@ -146,3 +146,23 @@ ggsave(filename = "results/fig3_4.png", plot = Fig3_4, width = 8, height = 5.76)
 #   ggsn::north(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
 #               scale = 0.15, symbol = 12, 
 #               location = "topleft")
+
+#####  Fig 5 #################
+rm(list = ls())
+name <- function(x) { as.data.frame(names(x))}
+
+v <- read_csv("results/REV-validation.csv")
+z <- v %>% select(ID,observed, predH, predNH) %>% 
+  mutate(id = row_number())
+names(z)[3:4] <- c("Harmonized", "Not harmonized")
+w <- z %>% group_by(id,observed) %>% 
+  gather(Harmonized, `Not harmonized`,
+         key = "variable", value = "pred")
+
+fig5 <-  ggplot(w, aes(x = observed, y = pred)) + geom_abline(intercept = 0, color = "white") +
+  geom_point(size = 0.1) + coord_fixed(ratio = 1) +#, xlim = c(0,20), ylim = c(0,20)) + 
+  facet_wrap(facets = "variable") + 
+  labs(x = "Observed", y = "Predicted") +
+  theme(text=element_text(size=16,  family="serif"))
+
+ggsave(filename = "results/fig5.png", plot = fig5, width = 8, height = 4)
