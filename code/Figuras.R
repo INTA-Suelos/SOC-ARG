@@ -8,6 +8,7 @@ library(raster)
 library(rgdal)
 library(tidyverse)
 library(cowplot)
+library(ggsn)
 
 
 # arg <- getData('GADM' , country="ARG", level=0)
@@ -27,9 +28,16 @@ arg <- st_as_sf(arg)
 # plot
 maps <- ggplot() + geom_sf(data = arg) + geom_sf(data = d, size = 0.3, aes(color = type)) +
   facet_wrap(facets = "type") + theme_grey() + labs(x = "Longitude", y = "Latitude") + 
-  theme(legend.position="none") +
+  theme(legend.position="none") + coord_sf() +
   theme(text=element_text(size=12,  family="serif"), 
-        axis.text.x = element_text(angle = 90, vjust = 0.5)) + theme(panel.spacing = unit(2.5, "lines"))
+        axis.text.x = element_text(angle = 90, vjust = 0.5)) + 
+  theme(panel.spacing = unit(2.5, "lines")) + 
+  ggsn::scalebar(data = d, st.color = "#666666", dist = 300, 
+                 st.size=3, height=0.02, transform = T,
+                 model = "WGS84", dist_unit = "km", facet.var = "type",
+                 border.size = 0.1, anchor = c(x=-56, y=-57)) + 
+  ggsn::north(data = d, scale = 0.15, symbol = 12, 
+              location = "topleft")
 # convert to tibble
 d <- as_tibble(d)
 d$Date <- d$Date %>% as.character() %>% strptime("%Y-%m-%d") %>% as.POSIXct()
@@ -53,15 +61,35 @@ ggsave(filename = "results/fig1.png", plot = fig1, width = 5, height = 7)
 rm(list = ls())
 name <- function(x) { as.data.frame(names(x))}
 library(rasterVis)
+
 # load predicted map
-soc <- raster("results/OCSKGM2015.tif")
+soc <- raster("results/REV-prediction.tif")
+arg <- read_sf("data/arg.gpkg")
+arg <- st_as_sf(arg)
+
+xmin <- sf::st_bbox(arg)["xmin"]
+xmax <- sf::st_bbox(arg)["xmax"]
+ymin <- sf::st_bbox(arg)["ymin"]
+ymax <- sf::st_bbox(arg)["ymax"]
+
+
 # plot 
 map <- gplot(soc, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
   scale_fill_gradient(na.value = "transparent", high = "yellow",
                       name = expression(kg/m^2)) +
   xlab("Longitude") + ylab("Latitude") +
-  coord_sf(crs = 4326) + 
-  theme(text=element_text(size=12,  family="serif"))
+  coord_sf(crs = 4326) + coord_equal() +
+  theme(text=element_text(size=12,  family="serif")) +
+  ggsn::scalebar(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
+                 st.color = "#666666", dist = 300, 
+                 st.size=3, height=0.02, transform = T,
+                 model = "WGS84", dist_unit = "km", 
+                 border.size = 0.1, anchor = c(x=-56, y=-57)) + 
+  ggsn::north(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
+              scale = 0.15, symbol = 12, 
+              location = "topleft")
+  
+
 # save
 ggsave(filename = "results/fig3.png", plot = map, width = 4, height = 7)
 ###############################################################
