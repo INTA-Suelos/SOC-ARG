@@ -107,10 +107,10 @@ map <-
                       breaks = c(0,5,15,30,50,70), trans = "log",
                       name = expression(kg/m^2)) +
     geom_tile(data=rc, aes(fill =value)) +
-    geom_sf(data = arg, inherit.aes = FALSE, fill = NA) + 
+    geom_sf(data = arg, inherit.aes = FALSE, fill = NA, size = 0.1) + 
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(crs = 4326) + #coord_equal() +
-  theme(text=element_text(size=12,  family="serif")) +
+  theme(text=element_text(size=10,  family="serif")) +
   ggsn::scalebar(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
                  st.color = "#666666", dist = 300, 
                  st.size=3, height=0.02, transform = T,
@@ -123,7 +123,7 @@ map <-
 
 
   # save
-ggsave(filename = "results/fig3.png", plot = map, width = 4, height = 7)
+ggsave(filename = "results/fig3.png", plot = map, width = 4.1, height = 5.5)
 
 ####### Fig 4 ###################################
 
@@ -137,10 +137,10 @@ map.u <-
                        breaks = c(0,3,6,9,12), trans = "log",
                        name = expression(kg/m^2)) +
   geom_tile(data=rc, aes(fill =value)) +
-  geom_sf(data = arg, inherit.aes = FALSE, fill = NA) + 
+  geom_sf(data = arg, inherit.aes = FALSE, fill = NA, size = 0.1) + 
   xlab("Longitude") + ylab("") +
   coord_sf(crs = 4326) + #coord_equal() +
-  theme(text=element_text(size=12,  family="serif")) +
+  theme(text=element_text(size=10,  family="serif")) +
   ggsn::scalebar(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
                  st.color = "#666666", dist = 300, 
                  st.size=3, height=0.02, transform = T,
@@ -154,7 +154,7 @@ Fig3_4 <- plot_grid(map, map.u, labels = c("a", "b"), ncol = 2, align = "h",
 
 ggsave(filename = "results/fig3_4.png", plot = Fig3_4, width = 8, height = 5.76)
 
-
+ggsave(filename = "results/fig4.png", plot = map.u, width = 4, height = 5.5)
 #### plot del error relativo (no pedido) #############################
 # rel.e <- soc.u/soc
 # summary(rel.e) 
