@@ -109,6 +109,7 @@ ggsave(filename = "results/fig3.png", plot = map, width = 4, height = 7)
 ####### Fig 4 ###################################
 
 soc.u <- raster("results/qrf_residuals.tif")
+soc.u <- soc.u*rc
 summary(soc.u)
 
 map.u <- 
@@ -118,6 +119,7 @@ map.u <-
                        na.value = "transparent",
                        breaks = c(0,3,6,9,12),
                        name = expression(kg/m^2)) +
+  geom_sf(data = arg, inherit.aes = FALSE, fill = NA) + 
   xlab("Longitude") + ylab("") +
   coord_sf(crs = 4326) + #coord_equal() +
   theme(text=element_text(size=12,  family="serif")) +
