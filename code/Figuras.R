@@ -66,13 +66,13 @@ library(rasterVis)
 soc <- raster("results/REV-prediction.tif")
 mask <- raster("/home/marcos/Documents/GDB/FAO_Chile/GSOC-Argentina/recorde_otras_clases_9a13.img")
 crs(mask) <- crs(soc)
-extent(mask) <- extent(soc)
-mask <- resample(x = mask, y = soc, method = "ngb")
-# all values >= 0 and <= 255 become 0, 0 become 1.
-m <- c(-1, 1, 1,  0.1, 255, NA)
+#extent(mask) <- extent(soc)
+m <- c(-1, 0.1, NA,  0.1, 255, 1)
 rclmat <- matrix(m, ncol=3, byrow=TRUE)
 rc <- reclassify(mask, rclmat)
-soc2 <- rc*soc
+#rc <- resample(x = rc, y = soc, method = "ngb")
+
+#soc2 <- raster::mask(mask = rc, x = soc)
 arg <- read_sf("data/arg.gpkg")
 arg <- st_as_sf(arg)
 
@@ -82,13 +82,31 @@ ymin <- sf::st_bbox(arg)["ymin"]
 ymax <- sf::st_bbox(arg)["ymax"]
 
 
+gplot_data <- function(x, maxpixels = 1e+6)  {
+  x <- raster::sampleRegular(x, maxpixels, asRaster = TRUE)
+  coords <- raster::xyFromCell(x, seq_len(raster::ncell(x)))
+  ## Extract values
+  dat <- utils::stack(as.data.frame(raster::getValues(x))) 
+  names(dat) <- c('value', 'variable')
+  
+  dat <- dplyr::as.tbl(data.frame(coords, dat))
+  
+  if (!is.null(levels(x))) {
+    dat <- dplyr::left_join(dat, levels(x)[[1]], 
+                            by = c("value" = "ID"))
+  }
+  dat
+}
+rc <- gplot_data(rc)
 # plot 
-map <- gplot(soc2, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
-    scale_fill_gradient2(low = "black",midpoint = 35, mid = "yellow",
-                         high = "red", space = "Lab",
+map <- 
+  gplot(soc, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
+    scale_fill_gradient2(low = "#fef0d9",
+                         high = "#b30000", space = "Lab",
                         na.value = "transparent",
-                      breaks = c(0,5,15,30,50,70),
+                      breaks = c(0,5,15,30,50,70), trans = "log",
                       name = expression(kg/m^2)) +
+    geom_tile(data=rc, aes(fill =value)) +
     geom_sf(data = arg, inherit.aes = FALSE, fill = NA) + 
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(crs = 4326) + #coord_equal() +
@@ -103,22 +121,22 @@ map <- gplot(soc2, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray
               location = "topleft")
   
 
-# save
+
+  # save
 ggsave(filename = "results/fig3.png", plot = map, width = 4, height = 7)
 
 ####### Fig 4 ###################################
 
 soc.u <- raster("results/qrf_residuals.tif")
-soc.u <- soc.u*rc
-summary(soc.u)
 
 map.u <- 
   gplot(soc.u, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
-  scale_fill_gradient2(low = "black",midpoint = 12, mid = "yellow",
-                       high = "red", space = "Lab",
+  scale_fill_gradient2(low = "#fef0d9",
+                       high = "#b30000", space = "Lab",
                        na.value = "transparent",
-                       breaks = c(0,3,6,9,12),
+                       breaks = c(0,3,6,9,12), trans = "log",
                        name = expression(kg/m^2)) +
+  geom_tile(data=rc, aes(fill =value)) +
   geom_sf(data = arg, inherit.aes = FALSE, fill = NA) + 
   xlab("Longitude") + ylab("") +
   coord_sf(crs = 4326) + #coord_equal() +
