@@ -64,6 +64,15 @@ library(rasterVis)
 
 # load predicted map
 soc <- raster("results/REV-prediction.tif")
+mask <- raster("/home/marcos/Documents/GDB/FAO_Chile/GSOC-Argentina/recorde_otras_clases_9a13.img")
+crs(mask) <- crs(soc)
+extent(mask) <- extent(soc)
+mask <- resample(x = mask, y = soc, method = "ngb")
+# all values >= 0 and <= 255 become 0, 0 become 1.
+m <- c(-1, 1, 1,  0.1, 255, NA)
+rclmat <- matrix(m, ncol=3, byrow=TRUE)
+rc <- reclassify(mask, rclmat)
+soc2 <- rc*soc
 arg <- read_sf("data/arg.gpkg")
 arg <- st_as_sf(arg)
 
@@ -74,12 +83,13 @@ ymax <- sf::st_bbox(arg)["ymax"]
 
 
 # plot 
-map <- gplot(soc, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
+map <- gplot(soc2, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray() +
     scale_fill_gradient2(low = "black",midpoint = 35, mid = "yellow",
                          high = "red", space = "Lab",
                         na.value = "transparent",
                       breaks = c(0,5,15,30,50,70),
                       name = expression(kg/m^2)) +
+    geom_sf(data = arg, inherit.aes = FALSE, fill = NA) + 
   xlab("Longitude") + ylab("Latitude") +
   coord_sf(crs = 4326) + #coord_equal() +
   theme(text=element_text(size=12,  family="serif")) +
@@ -87,7 +97,7 @@ map <- gplot(soc, maxpixels = 1e+6) + geom_tile(aes(fill = value)) + theme_gray(
                  st.color = "#666666", dist = 300, 
                  st.size=3, height=0.02, transform = T,
                  model = "WGS84", dist_unit = "km", 
-                 border.size = 0.1, anchor = c(x=-56, y=-57)) + 
+                 border.size = 0.1, anchor = c(x=-56, y=-57)) +
   ggsn::north(x.min = xmin, x.max = xmax, y.min = ymin, y.max = ymax,
               scale = 0.15, symbol = 12, 
               location = "topleft")
