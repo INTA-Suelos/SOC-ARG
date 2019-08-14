@@ -190,7 +190,7 @@ w <- z %>% group_by(id,observed) %>%
          key = "variable", value = "pred")
 
 fig5 <-  ggplot(w, aes(x = observed, y = pred)) + geom_abline(intercept = 0, color = "white") +
-  geom_point(size = 0.1) + coord_fixed(ratio = 1) +#, xlim = c(0,20), ylim = c(0,20)) + 
+  geom_point(stroke = 0.1, alpha = 0.3) + coord_fixed(ratio = 1, xlim = c(0,40), ylim = c(0,40)) + 
   facet_wrap(facets = "variable") + 
   labs(x = "Observed", y = "Predicted") +
   theme(text=element_text(size=16,  family="serif"))
