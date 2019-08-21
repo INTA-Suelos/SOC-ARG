@@ -8,7 +8,7 @@ library(caret)
 # Load data
 dat <- read.csv("data/REV-alldata.csv")
 
-dat$Date <- strptime(dat$Date, format =  "%Y-%m-%d")
+dat$Date <- strptime(dat$Date, format =  "%Y-%m-%d")wir
 
 library(sp)
 
@@ -47,6 +47,35 @@ stopCluster(cl = cl)
 
 prediction <- predict(covs, rfmodel)
 
+save(rfmodel, file ="results/final_prediction_model.RData")
 writeRaster(prediction, "results/REV-prediction.tif")
 
+imp <- as.data.frame(rfmodel$fit$importance)
+imp$var <- row.names(imp)
+names(imp)[1] <- "IncMSE"
 
+library(ggplot2)
+
+ggplot(imp, aes(x=reorder(var, IncMSE), y=IncMSE,fill=IncMSE))+ 
+  geom_bar(stat="identity", position="dodge")+ coord_flip()+
+  ylab("Variable Importance")+
+  xlab("")+
+  theme(text=element_text(size=12,  family="serif"), 
+        axis.text.x = element_text(angle = 90, vjust = 0.5)) + 
+  theme(panel.spacing = unit(2.5, "lines")) + 
+  ggtitle("Information Value Summary")+
+  guides(fill=F)+
+  scale_fill_gradient(low="red", high="blue")
+
+
+
+
+
+
+
+
+
+pred.proj <- projectRaster(prediction, crs=CRS("+init=epsg:22173"), res=1000)
+pred.proj
+sum(values(pred.proj), na.rm = T)
+prof_covsprof_covs

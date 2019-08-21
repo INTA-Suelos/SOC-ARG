@@ -165,3 +165,5 @@ out
 
 # mean_error cor_obspred cor_predres        RMSE         AVE         CCC      CCC.sd 
 # 0.8613567   0.8683793  -0.8400517   2.8262056   0.0788752  -0.8613567   2.6923390 
+
+write.csv(val, "results/REV-validation.csv", row.names = F)
