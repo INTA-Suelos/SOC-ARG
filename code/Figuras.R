@@ -57,6 +57,12 @@ fig1 <- plot_grid(maps, hist, labels = c("a", "b"), nrow = 2, align = "v",
 
 ggsave(filename = "results/fig1.png", plot = fig1, width = 5, height = 7)
 
+# plot figure 2
+ggplot(data = d) +
+  geom_histogram(aes(OCSKGM), binwidth = 0.5, fill = "blue", alpha = 0.5) +
+  geom_histogram(aes(OCSKGM2011), binwidth = 0.5, fill = "red", alpha = 0.5) +
+  theme_grey() + theme(legend.position="top") +  scale_fill_discrete("") +
+
 ###### Fig 3 ##########################
 rm(list = ls())
 name <- function(x) { as.data.frame(names(x))}
